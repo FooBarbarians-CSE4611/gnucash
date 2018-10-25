@@ -1551,6 +1551,7 @@ PrintAmountInternal(char *buf, gnc_numeric val, const GNCPrintAmountInfo *info)
     }
     else
     {
+
         char *decimal_point;
         guint8 num_decimal_places = 0;
         char *temp_ptr = temp_buf;
@@ -1560,6 +1561,7 @@ PrintAmountInternal(char *buf, gnc_numeric val, const GNCPrintAmountInfo *info)
                         : lc->decimal_point;
         g_utf8_strncpy(temp_ptr, decimal_point, 1);
         temp_ptr = g_utf8_find_next_char(temp_ptr, NULL);
+
 
         while (!gnc_numeric_zero_p (val)
                 && (val.denom != 1)
@@ -2412,13 +2414,23 @@ xaccParseAmountExtended (const char * in_str, gboolean monetary,
     {
         if ((auto_decimal_places > 0) && (auto_decimal_places < 9))
         {
-            denom = multiplier(auto_decimal_places);
 
+            
+            denom = multiplier(auto_decimal_places);
+           
             /* No need to multiply numer by denom at this point,
              * since by specifying the auto decimal places the
              * user has effectively determined the scaling factor
              * for the numerator they entered.
              */
+
+             /*
+              * multiplying numer * denom keeps the ratio balanced,
+              * as it was when entered. If not done,  the auto_dec
+              * preference will cause the user entered value to be
+              * divided by 10^(auto_decimal_places).
+              */
+             numer *= denom;
         }
     }
 
